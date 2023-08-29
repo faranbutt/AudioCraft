@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Music Generator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<h1>AI Music Generator</h1>
+
+<input type="file" id="imageInput" accept="image/*">
+<button id="generateDescription">Generate Description</button>
+<textarea id="descriptionText" rows="4" cols="50"></textarea>
+
+<button id="generatePrompt">Generate Music Prompt</button>
+<textarea id="promptText" rows="4" cols="50"></textarea>
+
+<button id="generateMusic">Generate Music</button>
+<audio id="audioPlayer" controls></audio>
+
+<script>
+    // Function to read image as Base64
+    function readFileAsDataURL(inputFile) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                resolve(event.target.result.split(',')[1]);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(inputFile);
+        });
+    }
+    const url = "http://localhost:8000/"
+
+    // Generate Image Description
+    $('#generateDescription').click(async function() {
+        const imageFile = $('#imageInput')[0].files[0];
+        const imageBase64 = await readFileAsDataURL(imageFile);
+        
+        $.ajax({
+            url: url + 'imagedescription',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({image: imageBase64}),
+            success: function(data) {
+                $('#descriptionText').val(data.description);
+            }
+        });
+    });
+
+
+    // Generate Music Prompt
+    $('#generatePrompt').click(function() {
+        const description = $('#descriptionText').val();
+        
+        $.post(url + 'musicgenprompt', {description: description}, function(data) {
+            $('#promptText').val(data.prompt);
+        });
+    });
+
+    // Generate Music
+    $('#generateMusic').click(function() {
+        const prompt = $('#promptText').val();
+        
+        $.post(url + 'generatemusic', {prompt: prompt}, function(data) {
+            const audioData = 'data:audio/wav;base64,' + data.audio;
+            $('#audioPlayer').attr('src', audioData);
+        });
+    });
+</script>
+
+</body>
+</html>
