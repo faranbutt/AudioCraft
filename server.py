@@ -13,6 +13,9 @@ from flask import jsonify, make_response, send_file
 import requests
 from bs4 import BeautifulSoup, Comment
 import base64
+import wave
+import array
+from io import BytesIO
 import openai
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 print("key:", openai.api_key)
@@ -154,22 +157,26 @@ Create a prompt for MusicGen that represents the image."""
 
 
 
-# from transformers import AutoProcessor, MusicgenForConditionalGeneration
-# processor = AutoProcessor.from_pretrained("facebook/musicgen-small")
-# model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-small").cuda()
+model = None
 def generate_music(prompt):
-    # inputs = processor(
-    #     text=[prompt],
-    #     padding=True,
-    #     return_tensors="pt",
-    # )
-    # inputs = {k: v.cuda() for k, v in inputs.items()}
-    # audio_values = model.generate(**inputs, max_new_tokens=50)
-    # sampling_rate = model.config.audio_encoder.sampling_rate
-    # audio_64 = audio_values[0].cpu().numpy()
+    global model
+    if model is None:
+        from transformers import AutoProcessor, MusicgenForConditionalGeneration
+        processor = AutoProcessor.from_pretrained("facebook/musicgen-small")
+        model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-small").cuda()
 
-    sampling_rate = 32000
-    audio_64 = ""
+    inputs = processor(
+        text=[prompt],
+        padding=True,
+        return_tensors="pt",
+    )
+    inputs = {k: v.cuda() for k, v in inputs.items()}
+    audio_values = model.generate(**inputs, max_new_tokens=1024)
+    sampling_rate = model.config.audio_encoder.sampling_rate
+    audio_64 = audio_values[0].cpu().numpy()[0].tolist()
+
+    # sampling_rate = 32000
+    # audio_64 = ""
 
     return (sampling_rate, audio_64)
 
@@ -200,8 +207,24 @@ def music_prompt():
 @app.route('/generatemusic', methods=['POST'])
 def music_generation():
     prompt = request.json.get('prompt')
-    sampling_rate, audio_64 = generate_music(prompt)
-    return jsonify({'sampling_rate': sampling_rate, 'audio': audio_64})
+    sampling_rate, audio_samples = generate_music(prompt)
+    
+    # Convert float32 array to 16-bit PCM
+    audio_samples = [int(sample * 32767) for sample in audio_samples]
+    
+    # Create BytesIO object to capture the audio in-memory
+    audio_io = BytesIO()
+    
+    # Create WAV file
+    with wave.open(audio_io, 'wb') as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)  # 2 bytes for 16-bit PCM
+        wf.setframerate(sampling_rate)
+        wf.writeframes(array.array('h', audio_samples).tobytes())
+    
+    audio_base64 = base64.b64encode(audio_io.getvalue()).decode('utf-8')
+    
+    return jsonify({'sampling_rate': sampling_rate, 'audio': audio_base64})
 
 
 
