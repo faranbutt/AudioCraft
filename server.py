@@ -86,7 +86,7 @@ def generate_image_description(image_bytes_64):
                 resources_pb2.Input(
                     data=resources_pb2.Data(
                         image=resources_pb2.Image(
-                            base64=bytes(image_bytes_64, 'utf-8')
+                            base64=base64.b64decode(image_bytes_64)
                         )
                     )
                 )
@@ -131,24 +131,24 @@ prompt: Asian-inspired orchestral piece with flowing melodies, featuring traditi
 The following is a description of the user's image: {image_description}
 Create a prompt for MusicGen that represents the image."""
 
-    # response = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=[
-    #         {
-    #             "role": "user",
-    #             "content": prompt
-    #         }
-    #         ],
-    #     temperature=0,
-    #     max_tokens=400,
-    #     top_p=0.95,
-    #     stop=[
-    #         "console.log(csv);"
-    #     ]
-    # )
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+            ],
+        temperature=0,
+        max_tokens=400,
+        top_p=0.95,
+        stop=[
+            "console.log(csv);"
+        ]
+    )
 
-    # text = response.choices[0].message.content
-    text = "90s rock song with loud guitars and heavy drums"
+    text = response.choices[0].message.content
+    # text = "90s rock song with loud guitars and heavy drums"
     return text
 
 

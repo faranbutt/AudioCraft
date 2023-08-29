@@ -53,8 +53,14 @@
     $('#generatePrompt').click(function() {
         const description = $('#descriptionText').val();
         
-        $.post(url + 'musicgenprompt', {description: description}, function(data) {
-            $('#promptText').val(data.prompt);
+        $.ajax({
+            url: url + 'musicgenprompt',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({description: description}),
+            success: function(data) {
+                $('#promptText').val(data.prompt);
+            }
         });
     });
 
@@ -62,11 +68,18 @@
     $('#generateMusic').click(function() {
         const prompt = $('#promptText').val();
         
-        $.post(url + 'generatemusic', {prompt: prompt}, function(data) {
-            const audioData = 'data:audio/wav;base64,' + data.audio;
-            $('#audioPlayer').attr('src', audioData);
+        $.ajax({
+            url: url + 'generatemusic',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({prompt: prompt}),
+            success: function(data) {
+                const audioData = 'data:audio/wav;base64,' + data.audio;
+                $('#audioPlayer').attr('src', audioData);
+            }
         });
     });
+
 </script>
 
 </body>
