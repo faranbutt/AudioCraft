@@ -1,3 +1,9 @@
 
 key.json
 vertex_text.ipynb
+node_modules
+tailwind.config.json
+package-lock.json
+package.json
+main.css
+tailwind.css

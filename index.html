@@ -3,21 +3,64 @@
 <head>
     <title>AI Music Generator</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./tailslim.css">
+    <style>
+         .custom-file-input input[type="file"] {
+      display: none;
+    }
+
+    .custom-file-input label::before {
+      content: "Choose File";
+      background-color: #4a90e2;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .custom-file-input input[type="file"]:focus + label::before {
+      outline: dotted;
+    }
+    </style>
 </head>
-<body>
+<body class="bg-gradient-to-b w-full h-full from-pink-600 to-purple-600" style='font-family: Inter;'>
+<div class="flex flex-col justify-center items-center">
+    <div class="w-screen h-full" style='background-image: url("./cover2.png");'>
+        <div class="pt-10"></div>
+    <div class="flex flex-col justify-center items-center">
+    <div class="flex justify-center items-center font-semibold text-transparent text-8xl bg-clip-text">
+    <img src="./Rectangle 6.png" alt="logo" width="100" height="100">
+    <span> < </span> <div class="text-white text-[64px] font-semibold">Music Mood App</div>
+</div>
+<div class="p-10 flex flex-col">
+<div class="flex flex-col p-5 gap-3 justify-center items-center">
 
-<h1>AI Music Generator</h1>
 
-<input type="file" id="imageInput" accept="image/*">
-<button id="generateDescription">Generate Description</button>
-<textarea id="descriptionText" rows="4" cols="50"></textarea>
+<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="imageInput">Upload file</label>
+<input class="block p-3 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="imageInput" type="file" accept="image/*">
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-300 font-bold" id="file_input_help">SVG, PNG, JPG or GIF (MAX. 800x400px).</p>
 
-<button id="generatePrompt">Generate Music Prompt</button>
-<textarea id="promptText" rows="4" cols="50"></textarea>
 
-<button id="generateMusic">Generate Music</button>
-<audio id="audioPlayer" controls></audio>
-
+<button id="generateDescription" class="flex justify-center items-center w-44 text-white font-bold bg-blue-400 py-2 px-3 rounded-full">Generate</button>
+<textarea id="descriptionText" rows="7" cols="50" class="rounded-lg border-4 border-blue-300 bg-purple-300"></textarea>
+</div>
+<div class="flex flex-col justify-center items-center gap-3">
+<button id="generatePrompt" class="flex justify-center items-center w-44 text-white font-bold bg-blue-400 py-2 px-3 rounded-full">Generate Music</button>
+<textarea id="promptText" rows="7" cols="50" class="rounded-lg border-4 border-blue-300 bg-purple-300"></textarea>
+<div></div>
+<div class="flex flex-col justify-center items-center gap-3 p-10">
+<button id="generateMusic" class="text-6xl text-white font-bold">Music Generated</button>
+<div class="max-w-md w-full bg-purple-800 p-8 rounded-lg shadow-lg">
+    <audio id="audioPlayer" controls class="w-full bg-purple-900 audio-1" />
+  </div>
+</div>
+</div>
+</div>
+</div>
+</div>
 <script>
     // Function to read image as Base64
     function readFileAsDataURL(inputFile) {
