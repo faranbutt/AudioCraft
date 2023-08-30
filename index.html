@@ -33,6 +33,9 @@
         #snapshotCanvas {
             display: none;
         }
+        #btns-2{
+            background-color: #4a90e2;
+        }
     </style>
 </head>
 
@@ -48,12 +51,13 @@
                 </div>
                 <div class="p-10 flex flex-col">
                     <!-- Tab Buttons -->
-                    <div class="flex justify-center items-center gap-3">
-                        <button id="imageTab" class="bg-blue-400 text-white py-2 px-4 rounded-full">Image Upload</button>
-                        <button id="webcamTab" class="bg-gray-400 text-white py-2 px-4 rounded-full">Webcam</button>
-                    </div>
-                    <!-- Tab Content -->
-                    <div id="imageContainer">
+                    <div class="flex flex-col justify-center items-center gap-3">
+                        
+                        <div id="btn-2" class="flex">
+                        <button id="imageTab" class="bg-blue-400 text-white py-4 px-3 rounded-lg">Image Upload</button>
+                        <button id="webcamTab" class="bg-gray-400 text-white py-4 px-3 rounded-lg">Webcam</button>
+                       </div>
+                       <div id="imageContainer">
                         <!-- Existing image upload form -->
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             for="imageInput">Upload image</label>
@@ -65,10 +69,16 @@
                     </div>
                     <div id="webcamContainer">
                         <!-- Webcam stream and snapshot button -->
+                        <div id="startWebcam">
+                            <img class="rounded-lg shadow-xl dark:shadow-gray-800" src="takephoto.jpg" width="400" height="" alt="image description" id="takePhoto">
+                        </div>
                         <video id="webcamVideo" width="400" height="300" autoplay style="margin: auto;"></video>
                         <!-- <button id="takeSnapshot">Take Snapshot</button> -->
                         <canvas id="snapshotCanvas" width="400" height="300"></canvas>
                     </div>
+                    </div>
+                    <!-- Tab Content -->
+                    
                     <div class="flex flex-col p-5 gap-3 justify-center items-center">
 
                         <button id="generateDescription"
@@ -109,7 +119,12 @@
                 });
             }
             const url = "http://localhost:8000/"
-
+            const startWebcamButton = document.getElementById("startWebcam");
+            const imageContainer = document.getElementById("imageContainer");
+            const webcamContainer = document.getElementById("webcamContainer");
+            const imageTab = document.getElementById("imageTab");
+            const webcamTab = document.getElementById("webcamTab");
+            const takePhotoImage = document.getElementById("takePhoto")
             // Function to capture webcam snapshot
             function captureSnapshot(video, canvas) {
                 const ctx = canvas.getContext('2d');
@@ -136,12 +151,23 @@
                 $("#imageTab").addClass('bg-gray-400');
                 $("#imageTab").removeClass('bg-blue-400');
             });
+             // Add a click event listener to hide the image when clicked
+takePhotoImage.addEventListener("click", () => {
+    takePhotoImage.style.display = "none";
+    // Show the webcam video element
+    webcamVideo.style.display = "block";
+    // Start the webcam
+    startWebcam();
+});           
 
-            // Initialize webcam
-            navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+            startWebcamButton.addEventListener('click', async() => {
+                takePhoto.style.display = "hidden";
+                navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
                 const video = document.getElementById('webcamVideo');
                 video.srcObject = stream;
             });
+            })
+           
 
             // // Take snapshot and capture data
             // $('#takeSnapshot').click(function () {
