@@ -212,7 +212,8 @@ def music_generation():
     sampling_rate, audio_samples = generate_music(prompt)
     
     # Convert float32 array to 16-bit PCM
-    audio_samples = [int(sample * 32767) for sample in audio_samples]
+    audio_samples = [int(min(max(sample * 32767, -32768), 32767)) for sample in audio_samples]
+
     
     # Create BytesIO object to capture the audio in-memory
     audio_io = BytesIO()
