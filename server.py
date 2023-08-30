@@ -1,3 +1,4 @@
+import replicate
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import argparse
@@ -208,26 +209,36 @@ def music_prompt():
 
 @app.route('/generatemusic', methods=['POST'])
 def music_generation():
-    prompt = request.json.get('prompt')
-    sampling_rate, audio_samples = generate_music(prompt)
+    # prompt = request.json.get('prompt')
+    # sampling_rate, audio_samples = generate_music(prompt)
     
-    # Convert float32 array to 16-bit PCM
-    audio_samples = [int(min(max(sample * 32767, -32768), 32767)) for sample in audio_samples]
+    # # Convert float32 array to 16-bit PCM
+    # audio_samples = [int(min(max(sample * 32767, -32768), 32767)) for sample in audio_samples]
 
     
-    # Create BytesIO object to capture the audio in-memory
-    audio_io = BytesIO()
+    # # Create BytesIO object to capture the audio in-memory
+    # audio_io = BytesIO()
     
-    # Create WAV file
-    with wave.open(audio_io, 'wb') as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)  # 2 bytes for 16-bit PCM
-        wf.setframerate(sampling_rate)
-        wf.writeframes(array.array('h', audio_samples).tobytes())
+    # # Create WAV file
+    # with wave.open(audio_io, 'wb') as wf:
+    #     wf.setnchannels(1)
+    #     wf.setsampwidth(2)  # 2 bytes for 16-bit PCM
+    #     wf.setframerate(sampling_rate)
+    #     wf.writeframes(array.array('h', audio_samples).tobytes())
     
-    audio_base64 = base64.b64encode(audio_io.getvalue()).decode('utf-8')
+    # audio_base64 = base64.b64encode(audio_io.getvalue()).decode('utf-8')
     
-    return jsonify({'sampling_rate': sampling_rate, 'audio': audio_base64})
+    # return jsonify({'sampling_rate': sampling_rate, 'audio': audio_base64})
+
+
+    prompt = request.json.get('prompt')
+    print("sending prompt to replicate:", prompt)
+    output = replicate.run(
+        "facebookresearch/musicgen:7a76a8258b23fae65c5a22debb8841d1d7e816b75c2f24218cd2bd8573787906",
+        input={"model_version": "large", "prompt": prompt, "duration": 5},
+    )
+    print("output:", output)
+    return jsonify({'audio_url': output})
 
 
 

@@ -105,6 +105,7 @@
                             <button id="generateMusic"
                                 class="flex justify-center items-center w-44 text-white font-bold bg-blue-400 py-2 px-3 rounded-full">Generate
                                 music</button>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-300 font-bold" id="loading" style="display: none;">loading... This may take up to a minute</p>
                             <div class="max-w-md w-full bg-purple-800 p-8 rounded-lg shadow-lg" style="width: 1326px;">
                                 <audio id="audioPlayer" controls class="w-full bg-purple-900 audio-1" />
                             </div>
@@ -225,6 +226,7 @@
             // Generate Music
             $('#generateMusic').click(function () {
                 const prompt = $('#promptText').val();
+                $("#loading").show();
 
                 $.ajax({
                     url: "https://fd9f-84-75-48-252.ngrok-free.app/" + 'generatemusic',
@@ -232,8 +234,10 @@
                     contentType: 'application/json',
                     data: JSON.stringify({ prompt: prompt }),
                     success: function (data) {
-                        const audioData = 'data:audio/wav;base64,' + data.audio;
-                        $('#audioPlayer').attr('src', audioData);
+                        // const audioData = 'data:audio/wav;base64,' + data.audio;
+                        // $('#audioPlayer').attr('src', audioData);
+                        $('#audioPlayer').attr('src', data.audio_url);
+                        $("#loading").hide();
                         alert("Music Generated");
                     },
                     error: function (error) {
