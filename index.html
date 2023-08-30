@@ -229,7 +229,7 @@
                 $("#loading").show();
 
                 $.ajax({
-                    url: "https://fd9f-84-75-48-252.ngrok-free.app/" + 'generatemusic',
+                    url:  url + 'generatemusic',
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({ prompt: prompt }),
