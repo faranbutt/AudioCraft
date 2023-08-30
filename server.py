@@ -158,8 +158,10 @@ Create a prompt for MusicGen that represents the image."""
 
 
 model = None
+processor = None
 def generate_music(prompt):
     global model
+    global processor
     if model is None:
         from transformers import AutoProcessor, MusicgenForConditionalGeneration
         processor = AutoProcessor.from_pretrained("facebook/musicgen-small")
