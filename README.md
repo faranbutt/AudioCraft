@@ -42,7 +42,7 @@ https://murmuring-shelf-65331-c2595f93dc55.herokuapp.com/https://flask-server-09
 View the Demo [App](https://www.youtube.com/watch?v=ojh5l7Mtepo&feature=youtu.be)
 
 ## Screenshots
-![y1](https://github.com/faranbutt/Web-Parser/blob/main/1.jpg)
+![y1](https://github.com/faranbutt/AudioCraft/blob/main/App.png)
 
 ## Technology Stack
 
