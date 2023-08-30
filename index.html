@@ -26,6 +26,13 @@
         .custom-file-input input[type="file"]:focus+label::before {
             outline: dotted;
         }
+        #webcamContainer {
+            display: none;
+        }
+
+        #snapshotCanvas {
+            display: none;
+        }
     </style>
 </head>
 
@@ -40,7 +47,14 @@
                     <div class="text-white text-[64px] font-semibold">Music Mood App</div>
                 </div>
                 <div class="p-10 flex flex-col">
-                    <div class="flex flex-col p-5 gap-3 justify-center items-center">
+                    <!-- Tab Buttons -->
+                    <div class="flex justify-center items-center gap-3">
+                        <button id="imageTab" class="bg-blue-400 text-white py-2 px-4 rounded-full">Image Upload</button>
+                        <button id="webcamTab" class="bg-gray-400 text-white py-2 px-4 rounded-full">Webcam</button>
+                    </div>
+                    <!-- Tab Content -->
+                    <div id="imageContainer">
+                        <!-- Existing image upload form -->
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             for="imageInput">Upload image</label>
                         <input
@@ -48,6 +62,15 @@
                             aria-describedby="file_input_help" id="imageInput" type="file" accept="image/*">
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-300 font-bold" id="file_input_help">SVG,
                             PNG, JPG or GIF (MAX. 800x400px).</p>
+                    </div>
+                    <div id="webcamContainer">
+                        <!-- Webcam stream and snapshot button -->
+                        <video id="webcamVideo" width="400" height="300" autoplay style="margin: auto;"></video>
+                        <!-- <button id="takeSnapshot">Take Snapshot</button> -->
+                        <canvas id="snapshotCanvas" width="400" height="300"></canvas>
+                    </div>
+                    <div class="flex flex-col p-5 gap-3 justify-center items-center">
+
                         <button id="generateDescription"
                             class="flex justify-center items-center w-44 text-white font-bold bg-blue-400 py-2 px-3 rounded-full">Generate
                             image description</button>
@@ -87,10 +110,59 @@
             }
             const url = "http://localhost:8000/"
 
+            // Function to capture webcam snapshot
+            function captureSnapshot(video, canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                return canvas.toDataURL().split(',')[1];
+            }
+
+            // Toggle between tabs
+            $('#imageTab').click(function () {
+                $('#imageContainer').show();
+                $('#webcamContainer').hide();
+                //switch from bg-blue-400 to bg-gray-400
+                $('#imageTab').addClass('bg-blue-400');
+                $('#imageTab').removeClass('bg-gray-400');
+                $("#webcamTab").addClass('bg-gray-400');
+                $("#webcamTab").removeClass('bg-blue-400');
+            });
+
+            $('#webcamTab').click(function () {
+                $('#webcamContainer').show();
+                $('#imageContainer').hide();
+                $('#webcamTab').addClass('bg-blue-400');
+                $('#webcamTab').removeClass('bg-gray-400');
+                $("#imageTab").addClass('bg-gray-400');
+                $("#imageTab").removeClass('bg-blue-400');
+            });
+
+            // Initialize webcam
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+                const video = document.getElementById('webcamVideo');
+                video.srcObject = stream;
+            });
+
+            // // Take snapshot and capture data
+            // $('#takeSnapshot').click(function () {
+            //     const canvas = document.getElementById('snapshotCanvas');
+            //     const video = document.getElementById('webcamVideo');
+            //     captureSnapshot(video, canvas);
+            // });
+
             // Generate Image Description
             $('#generateDescription').click(async function () {
-                const imageFile = $('#imageInput')[0].files[0];
-                const imageBase64 = await readFileAsDataURL(imageFile);
+                const usingWebcam = $('#webcamContainer').is(':visible');
+                let imageBase64;
+
+                if (usingWebcam) {
+                    const canvas = document.getElementById('snapshotCanvas');
+                    const video = document.getElementById('webcamVideo');
+                    imageBase64 = captureSnapshot(video, canvas);
+                } else {
+                    const imageFile = $('#imageInput')[0].files[0];
+                    imageBase64 = await readFileAsDataURL(imageFile);
+                }
 
                 $.ajax({
                     url: url + 'imagedescription',
@@ -101,9 +173,8 @@
                         $('#descriptionText').val(data.description);
                     }
                 });
+
             });
-
-
             // Generate Music Prompt
             $('#generatePrompt').click(function () {
                 const description = $('#descriptionText').val();
