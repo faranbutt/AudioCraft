@@ -173,7 +173,7 @@ def generate_music(prompt):
         return_tensors="pt",
     )
     inputs = {k: v.cuda() for k, v in inputs.items()}
-    audio_values = model.generate(**inputs, max_new_tokens=1024)
+    audio_values = model.generate(**inputs, max_new_tokens=512)
     sampling_rate = model.config.audio_encoder.sampling_rate
     audio_64 = audio_values[0].cpu().numpy()[0].tolist()
 

@@ -235,6 +235,9 @@
                         const audioData = 'data:audio/wav;base64,' + data.audio;
                         $('#audioPlayer').attr('src', audioData);
                         alert("Music Generated");
+                    },
+                    error: function (error) {
+                        alert(error);
                     }
                 });
             });
